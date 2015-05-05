@@ -12,6 +12,21 @@ $ composer require mdwheele/marky
 
 ## Usage
 
+**From Raw Text**:
+
+``` php
+require_once('vendor/autoload.php');
+
+use Marky\Marky;
+
+// Strips new-lines, but that's it...
+$marky = Marky::fromString('something long here is better');
+
+echo $marky->generate(500);
+```
+
+**From a File**:
+
 ``` php
 require_once('vendor/autoload.php');
 
