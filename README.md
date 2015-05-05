@@ -1,18 +1,25 @@
 # marky
 
-Marky is a markov-chain based text generator...
+Marky is a markov-chain based text generator... it will be a continuance of the work at http://www.haykranen.nl/2008/09/21/markov.
 
 ## Install
 
 Via Composer
 
 ``` bash
-$ composer require league/marky
+$ composer require mdwheele/marky
 ```
 
 ## Usage
 
 ``` php
+require_once('vendor/autoload.php');
+
+use Marky\Marky;
+
+$marky = Marky::fromFile('source.txt');
+
+echo $marky->generate(500);
 ```
 
 ## Testing
@@ -32,6 +39,7 @@ If you discover any security related issues, please email mdwheele@ncsu.edu inst
 ## Credits
 
 - [Dustin Wheeler](https://github.com/mdwheele)
+- [Hay Kranen](http://www.haykranen.nl/2008/09/21/markov)
 - [All Contributors](../../contributors)
 
 ## License
