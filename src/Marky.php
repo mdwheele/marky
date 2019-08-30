@@ -11,6 +11,10 @@ class Marky
      */
     private $table = [];
 
+    /**
+     * @var string
+     */
+    private $text = '';
 
     private function __construct($text)
     {
@@ -34,56 +38,68 @@ class Marky
 
     public function generate($length)
     {
-        $this->buildMarkovTableFromText(self::LOOKAHEAD);
+        if (empty($this->table)) {
+            $this->buildMarkovTableFromText(static::LOOKAHEAD);
+        }
+
+        $output = '';
 
         // get first character
         $char = array_rand($this->table);
-        $o = $char;
+        $output .= $char;
 
-        for ($i = 0; $i < ($length / self::LOOKAHEAD); $i++) {
+        $iterations = ($length / static::LOOKAHEAD);
+        for ($i = 0; $i < $iterations; $i++) {
             $newchar = $this->getWeightedCharacter($this->table[$char]);
 
-            if ($newchar) {
+            if (isset($newchar)) {
                 $char = $newchar;
-                $o .= $newchar;
+                $output .= $newchar;
             } else {
                 $char = array_rand($this->table);
             }
         }
 
-        return $o;
+        return $output;
     }
 
     private function buildMarkovTableFromText($lookAhead)
     {
+        $length = strlen($this->text);
+
         // now walk through the text and make the index table
-        for ($i = 0; $i < strlen($this->text); $i++) {
-            $char = substr($this->text, $i, $lookAhead);
-            if (!isset($this->table[$char])) $this->table[$char] = [];
-        }
-
-        // walk the array again and count the numbers
-        for ($i = 0; $i < (strlen($this->text) - $lookAhead); $i++) {
+        for ($i = 0; $i < $length; $i++) {
             $index = substr($this->text, $i, $lookAhead);
-            $count = substr($this->text, $i + $lookAhead, $lookAhead);
+            if (!isset($this->table[$index])) {
+                $this->table[$index] = [];
+            }
 
-            if (isset($table[$index][$count])) {
-                $this->table[$index][$count]++;
-            } else {
-                $this->table[$index][$count] = 1;
+            // count the numbers
+            if ($i < ($length - $lookAhead)) {
+                $count = substr($this->text, $i + $lookAhead, $lookAhead);
+
+                if (isset($table[$index][$count])) {
+                    $this->table[$index][$count]++;
+                } else {
+                    $this->table[$index][$count] = 1;
+                }
             }
         }
     }
 
     private function getWeightedCharacter($array)
     {
-        if (!$array) return false;
+        if (empty($array)) {
+            return null;
+        }
         $total = array_sum($array);
         $rand = mt_rand(1, $total);
         foreach ($array as $item => $weight) {
-            if ($rand <= $weight) return $item;
+            if ($rand <= $weight) {
+                return $item;
+            }
             $rand -= $weight;
         }
+        return null;
     }
-
 }
